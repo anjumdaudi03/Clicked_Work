@@ -1,8 +1,39 @@
 public with sharing class BillAPI {
     
     public static void getBills() {
-        //start by creating an HttpRequest object and set the endpoint and method.
+     HttpRequest req = new HttpRequest();
+     req.setEndpoint('callout:Billing_API');
+     req.setMethod('GET');
+     Http http = new Http();
+     HTTPResponse res = http.send(req);
+     //System.debug(res.getBody());
+     List<BillWrapper> bwList = (List<BillWrapper>)JSON.deserialize(res.getBody(), List<BillWrapper>.class);
+     
+        List<Bill__c> billsToInsert = new List<Bill__c>(); 
+        Map<String, Id> accountMap = new Map<String, Id>();
+        for(Account acc : [Select Name, Id From Account Where Active__c = 'Yes']){
+            accountMap.put(acc.Name, acc.Id);
+        }
+        List<String> billIds = new List<String>();
+        for(BillWrapper billWrap : bwList){
+            Bill__c newBill = new Bill__c();
+            newBill.Account__c = accountMap.get(billWrap.accountName);
+            newBill.Bill_Id__c = billWrap.billId;
+            newBill.Balance__c = Decimal.valueOf(billWrap.balance.replace('$', ''));
 
+            billsToInsert.add(newBill);
+            
+            billIds.add(newBill.Bill_Id__c);
+        }
+     	insert billsToInsert;
+        
+        /*List<Id> insertedIds = new List<Id>();
+        for(Id insertedId : insertedIds){
+            insertedIds.add(insertedId);
+        }*/
+        
+        List<Bill__c> billsToQuery = [Select Id, Account__c, Bill_Id__c, Balance__c From Bill__c Where Bill_Id__c in :billIds];
+        System.debug('Inserted Bills count: '+ billsToQuery.size());
 
         //set up an Http object and an HTTPResponse Object and use the .getBody() method here.
 
