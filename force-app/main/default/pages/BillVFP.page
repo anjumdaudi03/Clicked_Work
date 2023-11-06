@@ -1,39 +1,49 @@
-<apex:page standardController="Bill__c" renderAs="pdf">
-    <!--
-        The following outputTexts that are not rendered are used so that we
-        can access the values for the fields in a table per documentation here:
-        https://help.salesforce.com/s/articleView?id=000385722&type=1
-    -->
-    <apex:outputText value="{!Bill__c.Name}" rendered="false"/>
-    <apex:outputText value="{!Bill__c.Balance__c}" rendered="false"/>
-    <apex:outputText value="{!Bill__c.Bill_Id__c}" rendered="false"/>
+<apex:page standardController="Bill__c"  cache="false" standardStylesheets="true" showHeader="false" applyBodyTag="false" renderAs="pdf">
 
-    <!--
-        Because we are using the standard controller for the child object
-        we can access fields on the Parent object by utilizing the relationship
-        between the Bill__c and Account object, Account__r, as seen below:
-    -->
-    You are looking at the Most Recent Bill for {!Bill__c.Account__r.Name}.
-    <!--
-        The general format of fields on the Parent object will be:
-        ChildObject__c.ParentObject__r.FieldName__c
+    <p>You are looking at the Most Recent Bill for {!Bill__c.Account__r.Name}.</p><br/>
+    <apex:pageBlock >
+        <table>
+            <tr>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+            <tr>
+                <td><apex:outputText value="{!Bill__c.Account__r.Email__c}"/></td>
+                <td><apex:outputText value="{!Bill__c.Account__r.Phone}"/></td>
+            </tr>
+            <tr>
+                <td><apex:outputText value="  "/><br/></td>
+                <td><apex:outputText value="  "/><br/></td>
+            </tr>
+            <tr>
+                <th>Billing Address</th>
+                <th>Shipping Address</th>
+            </tr>
+            <tr>
+                <td><apex:outputText value="{!Bill__c.Account__r.BillingStreet}, {!Bill__c.Account__r.BillingCity}, {!Bill__c.Account__r.BillingState}, {!Bill__c.Account__r.BillingPostalCode}, {!Bill__c.Account__r.BillingCountry}" /></td>
+                <td><apex:outputText value="{!Bill__c.Account__r.ShippingStreet}, {!Bill__c.Account__r.ShippingCity}, {!Bill__c.Account__r.ShippingState}, {!Bill__c.Account__r.ShippingPostalCode}, {!Bill__c.Account__r.ShippingCountry}" /></td>
+            </tr>
+        </table>
+    <br/>
+    <br/>
+        <p><b>Bill Summary</b></p>
+        <table width="100%"  border="1" cellspacing="0">
+            <tr>
+                <th>Name</th>
+                <th>Balance</th>
+				<th>Bill Id</th>
+            </tr>
+            <tr>
+                <td><apex:outputText value="{!Bill__c.Name}"/></td>
+                <td>
+                	<apex:outputText value="${0, number, ### ### ### ###,000}">  
+                      <apex:param value="{!Bill__c.Balance__c}"/>  
+                 	</apex:outputText>
+                </td>
+				<td><apex:outputText value="{!Bill__c.Bill_Id__c}"/></td>
+            </tr>
 
-        The general format of fields on the Child object will be:
-        ChildObject__c.FieldName__c
-    -->
+        </table>
+    </apex:pageBlock>
 
-    <!--
-        Display information from the account here in an organized fasion,
-        such as  phone number, email address, billing address, and shipping address.
-
-        Hint: use apex:panelGrid and apex:PanelGroup to display this nicely.
-    -->
-
-
-    <!--
-        Build a table showing the Bill Summary (Bill Name, Bill Balance, and Bill Id) here.
-        Hint: use apex:pageBlockTable to display this in a table.
-    -->
-
-    
 </apex:page>
